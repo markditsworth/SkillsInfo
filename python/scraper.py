@@ -56,14 +56,22 @@ class LinkedInScraper:
         password_input = self.browser.find_element_by_id("password")
         password_input.send_keys(password)
         
-        XPATH="/html/body/div[@id='app__container']" #/main/div/form/div[@class='login__form_action_container']/button"
+        #XPATH="/html/body/div/main/div/form/div[3]/button"//*[@id="app__container"]/main/div/form/div[3]/button
+        #XPATH="/html/body/div/main/div/form/div[conatins(@class,'login__form_action_container')]/button"
+        #div[contains(@class, 'Caption') and text()='Model saved']
+        XPATH="/html/body/div/main/div/form/div[contains(@class, 'login__form_action_container')]/button"
         login_button = self.browser.find_element_by_xpath(XPATH)
         login_button.click()
+    
+    def searchLI(self, query):
+        search_bar = self.browser.find_element_by_xpath("/html/body/header/div/form/div/div/div/div/div[1]/div/input")
+        search_bar.send_keys(query)
     
 
 if __name__ == '__main__':
     username, password, driverpath, url = parseArgs()
     LIS = LinkedInScraper(username, password, driverpath, url)
     LIS.login()
+    #LIS.searchLI('Test')
 
 
