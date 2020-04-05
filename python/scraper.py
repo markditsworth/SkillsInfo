@@ -118,10 +118,19 @@ class LinkedInScraper:
             print("{}: {},{}".format(institution, degree, subject))
             
     def scrapeSkills(self):
+        # scroll to bottom
         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        # wait for new content to generate after scrolling
         time.sleep(4)
-        #skills_section = self.browser.find_element_by_xpath('//*[@id="ember534"]')
+        # get skills section
         skills_section = self.browser.find_element_by_class_name('pv-skill-categories-section') # pv-skill-categories-section artdeco-container-card ember-view')
+        top_skills = skills_section.find_elements_by_tag_name('li')
+        print("Top Skills:")
+        for top_skill in top_skills:
+            print(top_skill)
+            skill = top_skill.find_element_by_xpath('div/div').text
+            print(skill)
+        print("expanding to get more...")
         show_more_button = skills_section.find_element_by_xpath('div[2]/button')
         show_more_button.click()
             
