@@ -72,6 +72,6 @@ if __name__ == '__main__':
     username, password, driverpath, url = parseArgs()
     LIS = LinkedInScraper(username, password, driverpath, url)
     LIS.login()
-    #LIS.searchLI('Test')
+    LIS.searchLI('Test')
 
 
