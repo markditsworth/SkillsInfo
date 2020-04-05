@@ -98,6 +98,21 @@ class LinkedInScraper:
         print(users_links)
         return users_links
     
+    def scrapePage(url):
+        page_info = {}
+        page_info['user'] = # name
+        page_info['url'] = url
+        page_info['current_company'] = # current company
+        page_info['current_role'] = # current role
+        page_info['previous_companies'] = # list of previous companies
+        page_info['previous_roles'] = # list of previous roles
+        page_info['skills'] = # list of skills
+        page_info['location'] = # current location
+        page_info['hobbies'] = # hobbies
+        page_info['edu_institutions'] = # educational institutions attended
+        page_info['edu_'] = # degrees, etc.
+        
+        return page_info
         
 
 if __name__ == '__main__':
