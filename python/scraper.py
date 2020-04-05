@@ -23,12 +23,12 @@ To Do:
 """
 import argparse
 import time
-
+import selenium
 from selenium import webdriver 
 from selenium.webdriver.common.by import By 
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC 
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 
 def parseArgs():
@@ -121,18 +121,44 @@ class LinkedInScraper:
         # scroll to bottom
         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         # wait for new content to generate after scrolling
-        time.sleep(4)
+        time.sleep(1)
         # get skills section
-        skills_section = self.browser.find_element_by_class_name('pv-skill-categories-section') # pv-skill-categories-section artdeco-container-card ember-view')
-        top_skills = skills_section.find_elements_by_tag_name('li')
+        skills_section = self.browser.find_element_by_class_name('pv-skill-categories-section') 
+        subsection = skills_section.find_element_by_tag_name('ol')
+        top_skills = subsection.find_elements_by_tag_name('li')
+        print(len(top_skills))
         print("Top Skills:")
         for top_skill in top_skills:
-            print(top_skill)
-            skill = top_skill.find_element_by_xpath('div/div').text
-            print(skill)
+            try:
+                skill = top_skill.find_element_by_xpath('div/div/p/a/span').text
+                print(skill)
+            except selenium.common.exceptions.NoSuchElementException:
+                continue
+            
         print("expanding to get more...")
         show_more_button = skills_section.find_element_by_xpath('div[2]/button')
         show_more_button.click()
+        time.sleep(1)
+        print('Other skills:')
+        expanded_section = self.browser.find_element_by_id('skill-categories-expanded')
+        for x in expanded_section.find_elements_by_tag_name('div'):
+            for area in x.find_elements_by_tag_name('li'):
+                try:
+                    skill = area.find_element_by_xpath('div/div/p/a/span').text
+                    print(skill)
+                except selenium.common.exceptions.NoSuchElementException:
+                    continue
+    
+    def scrapeLanguages(self):
+        # scroll to bottom
+        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        # wait for new content to generate after scrolling
+        time.sleep(1)
+        print('Languages:')
+        lang_section = self.browser.find_element_by_id('languages-expandable-content').find_element_by_xpath('ul')
+        for x in lang_section.find_elements_by_tag_name('li'):
+            print(x.text)
+        
             
     def scrapePage(self, url):
         self.browser.get(url)
@@ -141,6 +167,7 @@ class LinkedInScraper:
         #self.scrapeEmployment()
         #self.scrapeEducation()
         self.scrapeSkills()
+        self.scrapeLanguages()
         return page_info
         
 
