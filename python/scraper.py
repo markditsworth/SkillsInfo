@@ -49,7 +49,7 @@ class LinkedInScraper:
         self.browser = webdriver.Chrome(executable_path=driverpath, chrome_options=option)
         self.browser.get(self.login_url)
         
-    def login(self):
+    def loginToLinkedIn(self):
         username_input = self.browser.find_element_by_id("username")
         username_input.send_keys(username)
         
@@ -63,15 +63,32 @@ class LinkedInScraper:
         login_button = self.browser.find_element_by_xpath(XPATH)
         login_button.click()
     
-    def searchLI(self, query):
-        search_bar = self.browser.find_element_by_xpath("/html/body/header/div/form/div/div/div/div/div[1]/div/input")
+    def searchForRelevantLIProfiles(self, query, page_limit=3):
+        count = 0
+        users_links = []
+        self.browser.get("https://google.com")
+        search_bar = self.browser.find_element_by_name('q')
+        query = "site:linkedin.com/in/ AND " + query
         search_bar.send_keys(query)
-    
+        
+        search_button = self.browser.find_element_by_xpath("/html/body/div/div[4]/form/div[2]/div[1]/div[3]/center/input[1]")
+        search_button.click()
+        
+        while count < page_limit:
+            results = self.browser.find_elements_by_class_name('r')
+            users_links.extend([result.find_element_by_tag_name('a').get_attribute('href') for result in results])
+            # go to next page
+            next_button = self.browser.find_element_by_id('pnnext')
+            next_page_link = next_button.get_attribute('href')
+            self.browser.get(next_page_link)
+            count += 1
+        
+        return users_links
 
 if __name__ == '__main__':
     username, password, driverpath, url = parseArgs()
     LIS = LinkedInScraper(username, password, driverpath, url)
-    LIS.login()
-    LIS.searchLI('Test')
+    LIS.loginToLinkedIn()
+    LIS.searchLI('"computer vision"')
 
 
