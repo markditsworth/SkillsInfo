@@ -22,6 +22,7 @@ To Do:
 - kafka producer
 """
 import argparse
+import time
 
 from selenium import webdriver 
 from selenium.webdriver.common.by import By 
@@ -98,20 +99,39 @@ class LinkedInScraper:
         print(users_links)
         return users_links
     
-    def scrapePage(url):
+    def scrapeLocation(self):
+        return self.browser.find_element_by_xpath('//*[@id="ember52"]/div[2]/div[2]/div[1]/ul[2]/li[1]').text
+    
+    def scrapeEmployment(self):
+        employment_section = self.browser.find_element_by_id('experience-section')
+        for h in employment_section.find_elements_by_tag_name('li'):
+            role = h.find_element_by_xpath('section/div/div/a/div[2]/h3').text
+            co = h.find_element_by_xpath('section/div/div/a/div[2]/p[2]').text
+            print("{}: {}".format(co, role))
+            
+    def scrapeEducation(self):
+        edu_section = self.browser.find_element_by_id('education-section')
+        for school in edu_section.find_elements_by_tag_name('li'):
+            institution = school.find_element_by_xpath('div/div/a/div[2]/div[1]/h3').text
+            degree = school.find_element_by_xpath('div/div/a/div[2]/div[1]/p[1]/span[2]').text
+            subject = school.find_element_by_xpath('div/div/a/div[2]/div[1]/p[2]/span[2]').text
+            print("{}: {},{}".format(institution, degree, subject))
+            
+    def scrapeSkills(self):
+        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(4)
+        #skills_section = self.browser.find_element_by_xpath('//*[@id="ember534"]')
+        skills_section = self.browser.find_element_by_class_name('pv-skill-categories-section') # pv-skill-categories-section artdeco-container-card ember-view')
+        show_more_button = skills_section.find_element_by_xpath('div[2]/button')
+        show_more_button.click()
+            
+    def scrapePage(self, url):
+        self.browser.get(url)
         page_info = {}
-        page_info['user'] = # name
-        page_info['url'] = url
-        page_info['current_company'] = # current company
-        page_info['current_role'] = # current role
-        page_info['previous_companies'] = # list of previous companies
-        page_info['previous_roles'] = # list of previous roles
-        page_info['skills'] = # list of skills
-        page_info['location'] = # current location
-        page_info['hobbies'] = # hobbies
-        page_info['edu_institutions'] = # educational institutions attended
-        page_info['edu_'] = # degrees, etc.
-        
+        #page_info['location'] = self.browser.find_element_by_xpath('//*[@id="ember52"]/div[2]/div[2]/div[1]/ul[2]/li[1]').text
+        #self.scrapeEmployment()
+        #self.scrapeEducation()
+        self.scrapeSkills()
         return page_info
         
 
@@ -119,6 +139,7 @@ if __name__ == '__main__':
     username, password, driverpath, url = parseArgs()
     LIS = LinkedInScraper(username, password, driverpath, url)
     LIS.loginToLinkedIn()
-    LIS.searchForRelevantLIProfiles('"computer vision"')
+    #LIS.searchForRelevantLIProfiles('"computer vision"')
+    LIS.scrapePage('https://www.linkedin.com/in/tsz-ho-yu-b749982a/')
 
 
