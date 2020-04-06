@@ -23,12 +23,15 @@ To Do:
 """
 import argparse
 import time
+import random
 import selenium
 from selenium import webdriver 
 from selenium.webdriver.common.by import By 
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC 
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+
+from hashlib import sha256
 
 
 def parseArgs():
@@ -53,18 +56,21 @@ class LinkedInScraper:
         option = webdriver.ChromeOptions()
         option.add_argument(" — incognito")
         self.browser = webdriver.Chrome(executable_path=driverpath, chrome_options=option)
-        self.browser.get(self.login_url)
         
     def loginToLinkedIn(self):
+        self.browser.get(self.login_url)
         username_input = self.browser.find_element_by_id("username")
         username_input.send_keys(username)
+        time.sleep(random.random() * 5)
         
         password_input = self.browser.find_element_by_id("password")
         password_input.send_keys(password)
         
         XPATH="/html/body/div/main/div/form/div[contains(@class, 'login__form_action_container')]/button"
         login_button = self.browser.find_element_by_xpath(XPATH)
+        time.sleep(random.random() * 3)
         login_button.click()
+        time.sleep(4)
     
     def searchForRelevantLIProfiles(self, query, page_limit=3):
         count = 0           # for keeping track of pagination
@@ -89,47 +95,36 @@ class LinkedInScraper:
             users_links.extend([result.find_element_by_tag_name('a').get_attribute('href') for result in results])
             
             # go to next page
-            next_button = self.browser.find_element_by_id('pnnext')
-            next_page_link = next_button.get_attribute('href')
-            self.browser.get(next_page_link)
             count += 1
             if count == page_limit:
                 break
+            next_button = self.browser.find_element_by_id('pnnext')
+            next_page_link = next_button.get_attribute('href')
+            self.browser.get(next_page_link)
         
         #print(users_links)
         return users_links
     
     def scrapeLocation(self):
-        return self.browser.find_element_by_xpath('//*[@id="ember52"]/div[2]/div[2]/div[1]/ul[2]/li[1]').text
-    
-    def scrapeEmployment(self):
-        employment_history = []
-        employment_section = self.browser.find_element_by_id('experience-section')
-        for h in employment_section.find_elements_by_tag_name('li'):
-            role = h.find_element_by_xpath('section/div/div/a/div[2]/h3').text
-            co = h.find_element_by_xpath('section/div/div/a/div[2]/p[2]').text
-            employment_history.append("{}: {}".format(co, role))
-        return employment_history
-            
-    def scrapeEducation(self):
-        edu_history = []
-        edu_section = self.browser.find_element_by_id('education-section')
-        for school in edu_section.find_elements_by_tag_name('li'):
-            institution = school.find_element_by_xpath('div/div/a/div[2]/div[1]/h3').text
-            degree = school.find_element_by_xpath('div/div/a/div[2]/div[1]/p[1]/span[2]').text
-            subject = school.find_element_by_xpath('div/div/a/div[2]/div[1]/p[2]/span[2]').text
-            edu_history.append("{}: {},{}".format(institution, degree, subject))
-        return edu_history
+        return self.browser.find_element_by_class_name('pv-top-card').find_element_by_xpath('div[2]/div[2]/div[1]/ul[2]/li[1]').text
     
     def scrapeSkills(self):
         top_skills_list = []
         skills_list = []
         # scroll to bottom
-        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        #self.browser.execute_script("window.scrollTo(0, 500);") #document.body.scrollHeight);")
         # wait for new content to generate after scrolling
-        time.sleep(2)
+        time.sleep(1)
         # get skills section
-        skills_section = self.browser.find_element_by_class_name('pv-skill-categories-section') 
+        scroll=500
+        while True:
+            try:
+                skills_section = self.browser.find_element_by_class_name('pv-skill-categories-section')
+                break
+            except selenium.common.exceptions.NoSuchElementException:
+                self.browser.execute_script("window.scrollTo(0, {});".format(scroll))
+                scroll += 500
+                time.sleep(random.random() + 1)
         subsection = skills_section.find_element_by_tag_name('ol')
         top_skills = subsection.find_elements_by_tag_name('li')
         #print(len(top_skills))
@@ -170,7 +165,7 @@ class LinkedInScraper:
         # scroll to bottom
         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         # wait for new content to generate after scrolling
-        time.sleep(2)
+        time.sleep(1)
         #print('Languages:')
         try:
             lang_section = self.browser.find_element_by_id('languages-expandable-content').find_element_by_xpath('ul')
@@ -183,10 +178,10 @@ class LinkedInScraper:
     
     def scrapePage(self, url):
         self.browser.get(url)
+        time.sleep(random.random()*3 + 1)
         page_info = {}
+        page_info['id'] = sha256(url.encode('utf-8')).hexdigest()
         page_info['location'] = self.scrapeLocation()
-        page_info['experience'] = self.scrapeEmployment()
-        page_info['education'] = self.scrapeEducation()
         top_skills, skills = self.scrapeSkills()
         page_info['top_skills'] = top_skills
         page_info['skills'] = skills
@@ -197,13 +192,15 @@ class LinkedInScraper:
 if __name__ == '__main__':
     username, password, driverpath, url = parseArgs()
     LIS = LinkedInScraper(username, password, driverpath, url)
-    LIS.loginToLinkedIn()
     relevant_users = LIS.searchForRelevantLIProfiles('"computer vision"', page_limit=2)
-    for user_link in relevant_users:
+    LIS.loginToLinkedIn()
+    for user_link in relevant_users[4:]:
+        print(user_link)
         info = LIS.scrapePage(user_link)
         print('Info from {}:'.format(user_link))
         for x in info:
             print("{}: {}".format(x, info[x]))
         print('')
+        time.sleep(random.random()*8)
 
 
