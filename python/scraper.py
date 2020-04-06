@@ -17,13 +17,13 @@ python scraper.py --username <your linkedin username> --password <your linkedin 
 --login-url defaults to the login page as of April 5, 2020
 
 To Do:
-- Add comments!
-- debug issues caused by scrolling necessity
+- Add comments and clean up
 - kafka producer
 """
 import argparse
 import time
 import random
+import json
 import selenium
 from selenium import webdriver 
 from selenium.webdriver.common.by import By 
@@ -44,9 +44,13 @@ def parseArgs():
                         help='Path to chromedriver')
     parser.add_argument('--login-url', type=str, default='https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin',
                         help='Path to URL page')
+    parser.add_argument('--test', action='store_true',
+                        help='write to local file')
+    parser.add_argument('--limit', type=int, default=3,
+                        help='number of google pages to limit search to')
     
     args = parser.parse_args()
-    return args.username, args.password, args.driver_path, args.login_url
+    return args.username, args.password, args.driver_path, args.login_url, args.test, args.limit
 
 class LinkedInScraper:
     def __init__(self, username, password, driverpath, login_url):
@@ -190,17 +194,17 @@ class LinkedInScraper:
         
 
 if __name__ == '__main__':
-    username, password, driverpath, url = parseArgs()
+    username, password, driverpath, url, test, page_limit = parseArgs()
     LIS = LinkedInScraper(username, password, driverpath, url)
-    relevant_users = LIS.searchForRelevantLIProfiles('"computer vision"', page_limit=2)
+    relevant_users = LIS.searchForRelevantLIProfiles('"computer vision"', page_limit=page_limit)
     LIS.loginToLinkedIn()
-    for user_link in relevant_users[4:]:
+    for user_link in relevant_users[6:]:
         print(user_link)
         info = LIS.scrapePage(user_link)
-        print('Info from {}:'.format(user_link))
-        for x in info:
-            print("{}: {}".format(x, info[x]))
-        print('')
+        if test:
+            with open('LIScraperOutput.json', 'a') as fObj:
+                fObj.write(json.dumps(info))
+                fObj.write('\n')
         time.sleep(random.random()*8)
 
 
