@@ -3,3 +3,4 @@ python/LI-scraper/include/*
 python/LI-scraper/lib/*
 python/LI-scraper/lib64
 python/LI-scraper/pyvenv.cfg
+*.json
