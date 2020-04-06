@@ -18,7 +18,6 @@ python scraper.py --username <your linkedin username> --password <your linkedin 
 
 To Do:
 - Add comments!
-- scrape info from page
 - kafka producer
 """
 import argparse
@@ -96,7 +95,7 @@ class LinkedInScraper:
             if count == page_limit:
                 break
         
-        print(users_links)
+        #print(users_links)
         return users_links
     
     def scrapeLocation(self):
@@ -127,7 +126,7 @@ class LinkedInScraper:
         # scroll to bottom
         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         # wait for new content to generate after scrolling
-        time.sleep(1.4)
+        time.sleep(2)
         # get skills section
         skills_section = self.browser.find_element_by_class_name('pv-skill-categories-section') 
         subsection = skills_section.find_element_by_tag_name('ol')
@@ -144,19 +143,25 @@ class LinkedInScraper:
             
         #print("expanding to get more...")
         skills_list.extend(top_skills_list)
-        show_more_button = skills_section.find_element_by_xpath('div[2]/button')
-        show_more_button.click()
-        time.sleep(1)
-        #print('Other skills:')
-        expanded_section = self.browser.find_element_by_id('skill-categories-expanded')
-        for x in expanded_section.find_elements_by_tag_name('div'):
-            for area in x.find_elements_by_tag_name('li'):
-                try:
-                    skill = area.find_element_by_xpath('div/div/p/a/span').text
-                    #print(skill)
-                    skills_list.append(skill)
-                except selenium.common.exceptions.NoSuchElementException:
-                    continue
+        try:
+            show_more_button = skills_section.find_element_by_xpath('div[2]/button')
+            show_more_button.click()
+            time.sleep(1)
+            #print('Other skills:')
+            expanded_section = self.browser.find_element_by_id('skill-categories-expanded')
+            for x in expanded_section.find_elements_by_tag_name('div'):
+                for area in x.find_elements_by_tag_name('li'):
+                    try:
+                        skill = area.find_element_by_xpath('div/div/p/a/span').text
+                        #print(skill)
+                        skills_list.append(skill)
+                    except selenium.common.exceptions.NoSuchElementException:
+                        continue
+        except selenium.common.exceptions.NoSuchElementException:
+            pass
+        except selenium.common.exceptions.ElementClickInterceptedException:
+            pass
+        
         return top_skills_list, skills_list
     
     def scrapeLanguages(self):
@@ -164,12 +169,15 @@ class LinkedInScraper:
         # scroll to bottom
         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         # wait for new content to generate after scrolling
-        time.sleep(1)
+        time.sleep(2)
         #print('Languages:')
-        lang_section = self.browser.find_element_by_id('languages-expandable-content').find_element_by_xpath('ul')
-        for x in lang_section.find_elements_by_tag_name('li'):
-            #print(x.text)
-            langs.append(x.text)
+        try:
+            lang_section = self.browser.find_element_by_id('languages-expandable-content').find_element_by_xpath('ul')
+            for x in lang_section.find_elements_by_tag_name('li'):
+                #print(x.text)
+                langs.append(x.text)
+        except selenium.common.exceptions.NoSuchElementException:
+            pass
         return langs
     
     def scrapePage(self, url):
@@ -189,9 +197,12 @@ if __name__ == '__main__':
     username, password, driverpath, url = parseArgs()
     LIS = LinkedInScraper(username, password, driverpath, url)
     LIS.loginToLinkedIn()
-    #LIS.searchForRelevantLIProfiles('"computer vision"')
-    d = LIS.scrapePage('https://www.linkedin.com/in/tsz-ho-yu-b749982a/')
-    for x in d:
-        print(d[x])
+    relevant_users = LIS.searchForRelevantLIProfiles('"computer vision"', page_limit=2)
+    for user_link in relevant_users:
+        info = LIS.scrapePage(user_link)
+        print('Info from {}:'.format(user_link))
+        for x in info:
+            print("{}: {}".format(x, info[x]))
+        print('')
 
 
