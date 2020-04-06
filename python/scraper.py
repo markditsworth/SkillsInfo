@@ -103,71 +103,85 @@ class LinkedInScraper:
         return self.browser.find_element_by_xpath('//*[@id="ember52"]/div[2]/div[2]/div[1]/ul[2]/li[1]').text
     
     def scrapeEmployment(self):
+        employment_history = []
         employment_section = self.browser.find_element_by_id('experience-section')
         for h in employment_section.find_elements_by_tag_name('li'):
             role = h.find_element_by_xpath('section/div/div/a/div[2]/h3').text
             co = h.find_element_by_xpath('section/div/div/a/div[2]/p[2]').text
-            print("{}: {}".format(co, role))
+            employment_history.append("{}: {}".format(co, role))
+        return employment_history
             
     def scrapeEducation(self):
+        edu_history = []
         edu_section = self.browser.find_element_by_id('education-section')
         for school in edu_section.find_elements_by_tag_name('li'):
             institution = school.find_element_by_xpath('div/div/a/div[2]/div[1]/h3').text
             degree = school.find_element_by_xpath('div/div/a/div[2]/div[1]/p[1]/span[2]').text
             subject = school.find_element_by_xpath('div/div/a/div[2]/div[1]/p[2]/span[2]').text
-            print("{}: {},{}".format(institution, degree, subject))
-            
+            edu_history.append("{}: {},{}".format(institution, degree, subject))
+        return edu_history
+    
     def scrapeSkills(self):
+        top_skills_list = []
+        skills_list = []
         # scroll to bottom
         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         # wait for new content to generate after scrolling
-        time.sleep(1)
+        time.sleep(1.4)
         # get skills section
         skills_section = self.browser.find_element_by_class_name('pv-skill-categories-section') 
         subsection = skills_section.find_element_by_tag_name('ol')
         top_skills = subsection.find_elements_by_tag_name('li')
-        print(len(top_skills))
-        print("Top Skills:")
+        #print(len(top_skills))
+        #print("Top Skills:")
         for top_skill in top_skills:
             try:
                 skill = top_skill.find_element_by_xpath('div/div/p/a/span').text
-                print(skill)
+         #       print(skill)
+                top_skills_list.append(skill)
             except selenium.common.exceptions.NoSuchElementException:
                 continue
             
-        print("expanding to get more...")
+        #print("expanding to get more...")
+        skills_list.extend(top_skills_list)
         show_more_button = skills_section.find_element_by_xpath('div[2]/button')
         show_more_button.click()
         time.sleep(1)
-        print('Other skills:')
+        #print('Other skills:')
         expanded_section = self.browser.find_element_by_id('skill-categories-expanded')
         for x in expanded_section.find_elements_by_tag_name('div'):
             for area in x.find_elements_by_tag_name('li'):
                 try:
                     skill = area.find_element_by_xpath('div/div/p/a/span').text
-                    print(skill)
+                    #print(skill)
+                    skills_list.append(skill)
                 except selenium.common.exceptions.NoSuchElementException:
                     continue
+        return top_skills_list, skills_list
     
     def scrapeLanguages(self):
+        langs = []
         # scroll to bottom
         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         # wait for new content to generate after scrolling
         time.sleep(1)
-        print('Languages:')
+        #print('Languages:')
         lang_section = self.browser.find_element_by_id('languages-expandable-content').find_element_by_xpath('ul')
         for x in lang_section.find_elements_by_tag_name('li'):
-            print(x.text)
-        
-            
+            #print(x.text)
+            langs.append(x.text)
+        return langs
+    
     def scrapePage(self, url):
         self.browser.get(url)
         page_info = {}
-        #page_info['location'] = self.browser.find_element_by_xpath('//*[@id="ember52"]/div[2]/div[2]/div[1]/ul[2]/li[1]').text
-        #self.scrapeEmployment()
-        #self.scrapeEducation()
-        self.scrapeSkills()
-        self.scrapeLanguages()
+        page_info['location'] = self.scrapeLocation()
+        page_info['experience'] = self.scrapeEmployment()
+        page_info['education'] = self.scrapeEducation()
+        top_skills, skills = self.scrapeSkills()
+        page_info['top_skills'] = top_skills
+        page_info['skills'] = skills
+        page_info['languages'] = self.scrapeLanguages()
         return page_info
         
 
@@ -176,6 +190,8 @@ if __name__ == '__main__':
     LIS = LinkedInScraper(username, password, driverpath, url)
     LIS.loginToLinkedIn()
     #LIS.searchForRelevantLIProfiles('"computer vision"')
-    LIS.scrapePage('https://www.linkedin.com/in/tsz-ho-yu-b749982a/')
+    d = LIS.scrapePage('https://www.linkedin.com/in/tsz-ho-yu-b749982a/')
+    for x in d:
+        print(d[x])
 
 
