@@ -18,6 +18,7 @@ python scraper.py --username <your linkedin username> --password <your linkedin 
 
 To Do:
 - Add comments!
+- debug issues caused by scrolling necessity
 - kafka producer
 """
 import argparse
