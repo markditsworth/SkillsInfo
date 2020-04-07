@@ -5,9 +5,12 @@
   },
   "mappings": {
     "_source": {
-      "enabled": false
+      "enabled": true
     },
     "properties": {
+      "@timestamp": {
+	"type": "date"
+      },
       "id": {
         "type": "keyword"
       },
@@ -15,13 +18,13 @@
         "type": "keyword"
       },
       "top_skills": {
-        "type": "object"
+        "type": "keyword"
       },
       "skills": {
-        "type": "object"
+        "type": "keyword"
       },
       "languages": {
-        "type": "object"
+        "type": "keyword"
       },
       "coordinates": {
         "type": "geo_point"
