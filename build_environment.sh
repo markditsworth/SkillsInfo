@@ -23,4 +23,9 @@ echo -n "Building Logstash container..."
 cd ../logstash
 ./init.sh
 echo "     Done."
-echo "Ready for tweets!"
+
+echo -n "Building Python venv..."
+cd ../python
+./build_scraper_venv.sh
+echo "    Done."
+echo "Ready to scrape"
