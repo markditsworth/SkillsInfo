@@ -6,7 +6,7 @@ SkillsInfo makes available a Selenium webscraper for LinkedIn crawling, Google's
 Selenium searches Linkedin pages (via a Google dork) based on a keyword (e.g. "computer_vision"). The results from the first handful of pages arenoted, and then scraped themselves for location, skills (with the three-stop skills noted), and languages spoken. No identifying info such as names, work history, or education history is lifted from the LinkedIn pages. A healthy amount of delays are included during each page's scrape to reduce the load on the underlying webservers at LinkedIn.
 
 ### Example
-In Kibana, you can easily create visualizations to help draw insights from the data in Elasticsearch. Here, we limited our seach to outside the New York City and San Fransisco areas, and searched for people skilled in LaTeX. The map illustrates the hot-spots for this skill. The top pie chart shows the popularity of other skills held by those skilled in JavaScript, and the bottom pie chart shows the popularity of languages spoken by those skilled in LaTeX.
+In Kibana, you can easily create visualizations to help draw insights from the data in Elasticsearch. Here, we limited our seach to outside the New York City and San Fransisco areas, and searched for people skilled in LaTeX. The map illustrates the hot-spots for this skill. The top pie chart shows the popularity of other skills held by those skilled in LaTeX, and the bottom pie chart shows the popularity of languages spoken by those skilled in LaTeX.
 ![example](images/map_example.png)
 
 ### Architecture Diagram
