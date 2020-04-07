@@ -2,7 +2,8 @@
 ### An environment for geospatailly analyzing skills in the labor market
 
 SkillsInfo makes available a Selenium webscraper for LinkedIn crawling, Google's [Geocoding API](https://developers.google.com/maps/documentation/geocoding/start) for enriching information acquired by the webcrawler, and the ELK stack for storage, rapid full-text searching, and geospatial viziualization.
-Selenium searches Linkedin pages (via a Google dork) based on a keyword (e.g. "computer_vision"). The results from the first handful of pages noted, and then scraped themselves for location, skills (with the three-stop skills noted), and languages spoken. No identifying info such as names, work history, or education history is lifted from the LinkedIn pages. A healthy amount of delays are included during each page's scrape to reduce the load on the underlying webservers at LinkedIn.
+
+Selenium searches Linkedin pages (via a Google dork) based on a keyword (e.g. "computer_vision"). The results from the first handful of pages arenoted, and then scraped themselves for location, skills (with the three-stop skills noted), and languages spoken. No identifying info such as names, work history, or education history is lifted from the LinkedIn pages. A healthy amount of delays are included during each page's scrape to reduce the load on the underlying webservers at LinkedIn.
 
 ### Example
 ![example](images/map_example.png)
