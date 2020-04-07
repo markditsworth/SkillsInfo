@@ -115,7 +115,11 @@ class LinkedInScraper:
         return users_links
     
     def scrapeLocation(self):
-        return self.browser.find_element_by_class_name('pv-top-card').find_element_by_xpath('div[2]/div[2]/div[1]/ul[2]/li[1]').text
+        try:
+            location = self.browser.find_element_by_class_name('pv-top-card').find_element_by_xpath('div[2]/div[2]/div[1]/ul[2]/li[1]').text
+        except selenium.common.exceptions.NoSuchElementException:
+            location = False
+        return location
     
     def scrapeSkills(self):
         top_skills_list = []
@@ -133,6 +137,8 @@ class LinkedInScraper:
             except selenium.common.exceptions.NoSuchElementException:
                 self.browser.execute_script("window.scrollTo(0, {});".format(scroll))
                 scroll += 500
+                if scroll > 5000:
+                    return top_skills_list, skills_list
                 time.sleep(random.random() + 1)
         subsection = skills_section.find_element_by_tag_name('ol')
         top_skills = subsection.find_elements_by_tag_name('li')
@@ -190,12 +196,16 @@ class LinkedInScraper:
         time.sleep(random.random()*3 + 1)
         page_info = {}
         page_info['id'] = sha256(url.encode('utf-8')).hexdigest()
-        page_info['location'] = self.scrapeLocation()
-        top_skills, skills = self.scrapeSkills()
-        page_info['top_skills'] = top_skills
-        page_info['skills'] = skills
-        page_info['languages'] = self.scrapeLanguages()
-        return page_info
+        location = self.scrapeLocation()
+        if location:
+            page_info['location'] = location
+            top_skills, skills = self.scrapeSkills()
+            page_info['top_skills'] = top_skills
+            page_info['skills'] = skills
+            page_info['languages'] = self.scrapeLanguages()
+            return page_info
+        else:
+            return False
         
 
 if __name__ == '__main__':
@@ -206,9 +216,11 @@ if __name__ == '__main__':
     query = '"{}"'.format(' '.join(topic.split('_')))
     relevant_users = LIS.searchForRelevantLIProfiles(query, page_limit=page_limit)
     LIS.loginToLinkedIn()
-    for user_link in relevant_users:
+    for user_link in relevant_users[48:]:
         print(user_link)
         info = LIS.scrapePage(user_link)
+        if not info:
+            continue
         if backup:
             with open('{}_output.json'.format(topic), 'a') as fObj:
                 fObj.write(json.dumps(info))
