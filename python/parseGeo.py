@@ -22,8 +22,8 @@ def argParse():
     parser = argparse.ArgumentParser(description='Parse LinkedIn Skills Data')
     parser.add_argument('--topic', type=str,
                         help='topic to read from')
-    parser.add_argument('--host', type=str, help="Kafka hostname")
-    parser.add_argument('--port', type=int, help="Kafka port number")
+    parser.add_argument('--host', type=str, default="localhost", help="Kafka hostname")
+    parser.add_argument('--port', type=int, default=29092, help="Kafka port number")
     args = parser.parse_args()
     raw_topic = args.topic
     parsed_topic = 'parsed-' + raw_topic
