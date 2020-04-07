@@ -6,3 +6,4 @@ python/LI-scraper/pyvenv.cfg
 python/__pycache__/
 python/secret.py
 *.json
+!*_template.json
