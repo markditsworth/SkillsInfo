@@ -11,7 +11,7 @@ Requirements
 - a chrome driver corresponding to your version of chrome (see https://sites.google.com/a/chromium.org/chromedriver/downloads)
 
 Example:
-python scraper.py --username <your linkedin username> --password <your linkedin password> --driver-path </path/to/chrome/driver> --login-url <https://linkedin.com/path/to/login/path?and&other&params>
+python scraper.py --topic computer_vision --username <your linkedin username> --password <your linkedin password> --driver-path </path/to/chrome/driver> --login-url <https://linkedin.com/path/to/login/path?and&other&params>
 
 --driver-path defaults to /usr/local/bin/chromedriver
 --login-url defaults to the login page as of April 5, 2020
@@ -49,10 +49,10 @@ def parseArgs():
                         help='kafka host')
     parser.add_argument('--kafka-port', type=int, default=29092,
                         help='kafka port')
-    parser.add_argument('--backup', action='store_true', help='output to local json file LIScraperOutput.json')
+    parser.add_argument('--backup', action='store_true', help='output to local json file <topic>_output.json')
     
     args = parser.parse_args()
-    return args.topic, args.username, args.password, args.driver_path, args.login_url, args.limit, args.kafka_host, args.kafka_port
+    return args.topic, args.username, args.password, args.driver_path, args.login_url, args.limit, args.kafka_host, args.kafka_port, args.backup
 
 def serialize(dictionary):
     return json.dumps(dictionary).encode('ascii')
@@ -210,7 +210,7 @@ if __name__ == '__main__':
         print(user_link)
         info = LIS.scrapePage(user_link)
         if backup:
-            with open('LIScraperOutput.json', 'a') as fObj:
+            with open('{}_output.json'.format(topic), 'a') as fObj:
                 fObj.write(json.dumps(info))
                 fObj.write('\n')
         producer.send(topic, serialize(info))
