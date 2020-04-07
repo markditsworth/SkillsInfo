@@ -8,7 +8,7 @@ Created on Mon Apr  6 21:17:54 2020
 To Do:
 --- Kafka Consumer
 -/- Add geo_point field (https://www.elastic.co/guide/en/elasticsearch/reference/7.6/geo-point.html)
---- Kafka Producer
+-/- Kafka Producer
 """
 
 import secret
