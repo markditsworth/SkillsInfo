@@ -18,6 +18,8 @@ In Kibana, you can easily create visualizations to help draw insights from the d
 - Docker
 - A Google Geocoding API Key
 - A LinkedIn account
+- Google Chrome Browser
+- A [chrome driver](https://sites.google.com/a/chromium.org/chromedriver/downloads) for your version of Chrome.
 
 ### How To Run:
 1. Ensure all dependencies are satisfied and clone the repo
