@@ -44,7 +44,7 @@ def enrichLocation(info, api_key):
         lat, long = getLatLong(info['location'],api_key)
         enriched_info['coordinates'] = {'lat': lat, 'lon': long}
     else:
-        enriched_info['coordinates'] = {'lat': -999, 'lon': -999}
+        enriched_info['coordinates'] = {'lat': 0, 'lon': 0}
     return enriched_info
 
 def serialize(dictionary):
