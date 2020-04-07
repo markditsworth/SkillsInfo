@@ -16,8 +16,6 @@ python scraper.py --topic computer_vision --username <your linkedin username> --
 --driver-path defaults to /usr/local/bin/chromedriver
 --login-url defaults to the login page as of April 5, 2020
 
-To Do:
-- Add comments and clean up
 """
 import argparse
 import time
