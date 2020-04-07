@@ -32,3 +32,6 @@ source LI-Scraper/bin/activate
 python parseGeo.py --topic <same topic you passed in to the scraper> [ --from-file (if you're reading from file. Omit if you consume from kafka) ]
 ```
 7. Data should start showing up in Kibana. Navigate to `localhost:5601` in your browser. Create your index pattern(s), and navigate to Visualizations to create the map visualization.
+
+### Note
+Running Kafka, the ELK stack, and Chrome all at once is very memory intensive. If need be, make use of the `--backup` and `--from-file` functionality to store LinkedIn info to disk, and only spin up ELK once the web scraping has finished.
