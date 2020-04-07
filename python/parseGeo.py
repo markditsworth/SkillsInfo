@@ -63,7 +63,7 @@ if __name__ == '__main__':
         for m in consumer:
             message= m.value
             print(message)
-            enriched_message = enrichLocation(message, secret.geolocate_api_key)
+            enriched_message = enrichLocation(message, secret.geocoder_api_key)
             producer.send(parsed_topic, serialize(enriched_message))
             
     else:
@@ -74,7 +74,7 @@ if __name__ == '__main__':
         for x in content:
             data = json.loads(x)
             print(data['location'])
-            enriched_data = enrichLocation(data, secret.geolocate_api_key)
+            enriched_data = enrichLocation(data, secret.geocoder_api_key)
             # send to kafka
             producer.send(parsed_topic, serialize(enriched_data))
         producer.flush()
