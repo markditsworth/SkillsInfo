@@ -2,10 +2,13 @@
 ### An environment for geospatailly analyzing skills in the labor market
 
 SkillsInfo makes available a Selenium webscraper for LinkedIn crawling, Google's [Geocoding API](https://developers.google.com/maps/documentation/geocoding/start) for enriching information acquired by the webcrawler, and the ELK stack for storage, rapid full-text searching, and geospatial viziualization.
+Selenium searches Linkedin pages (via a Google dork) based on a keyword (e.g. "computer_vision"). The results from the first handful of pages noted, and then scraped themselves for location, skills (with the three-stop skills noted), and languages spoken. No identifying info such as names, work history, or education history is lifted from the LinkedIn pages. A healthy amount of delays are included during each page's scrape to reduce the load on the underlying webservers at LinkedIn.
 
 ### Example
+![example](images/map_example.png)
 
 ### Architecture Diagram
+![arch](images/arch-diagram.png)
 
 ### Dependencies
 - A Linux host machine
@@ -38,4 +41,4 @@ python parseGeo.py --topic <same topic you passed in to the scraper> [ --from-fi
 8. Data should start showing up in Kibana. Navigate to `localhost:5601` in your browser. Create your index pattern(s), and navigate to Visualizations to create the map visualization.
 
 #### Note
-Running Kafka, the ELK stack, and Chrome all at once is very memory intensive. If need be, make use of the `--backup` and `--from-file` functionality to store LinkedIn info to disk, and only spin up ELK once the web scraping has finished.
+Running Kafka, the ELK stack, and Chrome all at once is very memory intensive. If need be, first just scrape and enrich data writing to Kafka, and only spin up ELK once the web scraping has finished.
