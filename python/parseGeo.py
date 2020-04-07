@@ -17,6 +17,7 @@ import requests
 import argparse
 
 from kafka import KafkaProducer
+from kafka import KafkaConsumer
 
 def argParse():
     parser = argparse.ArgumentParser(description='Parse LinkedIn Skills Data')
@@ -24,10 +25,11 @@ def argParse():
                         help='topic to read from')
     parser.add_argument('--host', type=str, default="localhost", help="Kafka hostname")
     parser.add_argument('--port', type=int, default=29092, help="Kafka port number")
+    parser.add_argument('--from-file', action='store_true', help="Read from file instead of kafka")
     args = parser.parse_args()
     raw_topic = args.topic
     parsed_topic = 'parsed-' + raw_topic
-    return args.topic, parsed_topic, args.host, args.port
+    return args.topic, parsed_topic, args.host, args.port, args.from_file
 
 def getLatLong(location, api_key):
     url = "https://maps.googleapis.com/maps/api/geocode/json"
@@ -51,19 +53,29 @@ def serialize(dictionary):
         return json.dumps(dictionary).encode('ascii')
     
 if __name__ == '__main__':
-    topic, parsed_topic, host, port = argParse()
-    
-    path = 'LIScraperOutput.json'
-    
+    topic, parsed_topic, host, port, from_file = argParse()
     producer = KafkaProducer(bootstrap_servers=["{}:{}".format(host,port)])
-    
-    with open(path,'r') as fObj:
-        content = fObj.readlines()
-    print(len(content))
-    for x in content:
-        data = json.loads(x)
-        print(data['location'])
-        enriched_data = enrichLocation(data, secret.geolocate_api_key)
-        # send to kafka
-        producer.send(parsed_topic, serialize(enriched_data))
-    producer.flush()
+    if not from_file:
+        consumer = KafkaConsumer(topic, group_id='{}-consumer-group-1'.format(topic),
+                                      bootstrap_servers=["{}:{}".format(host,port)],
+                                      auto_offset_reset='earliest',
+                                      value_deserializer=lambda m: json.loads(m.decode('ascii')))
+        for m in consumer:
+            message= m.value
+            print(message)
+            enriched_message = enrichLocation(message, secret.geolocate_api_key)
+            producer.send(parsed_topic, serialize(enriched_message))
+            
+    else:
+        path = "{}_output.json".format(topic)    
+        with open(path,'r') as fObj:
+            content = fObj.readlines()
+        
+        for x in content:
+            data = json.loads(x)
+            print(data['location'])
+            enriched_data = enrichLocation(data, secret.geolocate_api_key)
+            # send to kafka
+            producer.send(parsed_topic, serialize(enriched_data))
+        producer.flush()
+        print("Messages from {} sent.".format(path))
