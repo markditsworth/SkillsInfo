@@ -1,0 +1,31 @@
+{
+  "index_patterns": ["computer_vision_index*"],
+  "settings": {
+    "number_of_shards": 1
+  },
+  "mappings": {
+    "_source": {
+      "enabled": false
+    },
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "location": {
+        "type": "keyword"
+      },
+      "top_skills": {
+        "type": "object"
+      },
+      "skills": {
+        "type": "object"
+      },
+      "languages": {
+        "type": "object"
+      },
+      "coordinates": {
+        "type": "geo_point"
+      }
+    }
+  }
+}
