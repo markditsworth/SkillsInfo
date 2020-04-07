@@ -44,7 +44,7 @@ def enrichLocation(info, api_key):
         lat, long = getLatLong(info['location'],api_key)
         enriched_info['coordinates'] = {'lat': lat, 'lon': long}
     else:
-        pass
+        enriched_info['coordinates'] = {'lat': -999, 'lon': -999}
     return enriched_info
 
 def serialize(dictionary):
@@ -59,9 +59,11 @@ if __name__ == '__main__':
     
     with open(path,'r') as fObj:
         content = fObj.readlines()
-    
+    print(len(content))
     for x in content:
         data = json.loads(x)
+        print(data['location'])
         enriched_data = enrichLocation(data, secret.geolocate_api_key)
         # send to kafka
         producer.send(parsed_topic, serialize(enriched_data))
+    producer.flush()
