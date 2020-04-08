@@ -7,3 +7,5 @@ python/__pycache__/
 python/secret.py
 *.json
 !*_template.json
+logstash/*.conf
+!logstash/pipeline_template.conf
