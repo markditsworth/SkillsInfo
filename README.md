@@ -1,5 +1,5 @@
 # SkillsInfo
-### An environment for geospatailly analyzing skills in the labor market
+### An environment for geospatially analyzing skills in the labor market
 
 SkillsInfo makes available a Selenium webscraper for LinkedIn crawling, Google's [Geocoding API](https://developers.google.com/maps/documentation/geocoding/start) for enriching information acquired by the webcrawler, and the ELK stack for storage, rapid full-text searching, and geospatial viziualization.
 
